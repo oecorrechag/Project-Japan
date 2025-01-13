@@ -52,17 +52,17 @@ def transformar_datos_carateristicas(df: pd.DataFrame) -> pd.DataFrame:
                             'P1898':'satisfaccion_seguridad', 'P1899': 'satisfaccion_trabajo', 'P1901': 'felicidad',
                             'P1903':'preocupacion', 'P1904': 'tristeza', 'P1905': 'deseo_vivir', 'P1927': 'escalon_vida',
                             'P2057':'campesino', 'P3175':'satisfaccion_tiempo_libre', 'P3038':'atraccion_sexual',
-                            'P3039':'se_reconoce_como'
+                            'P3039': 'se_reconoce_como', 'P6016':'generador_informacion',
                             })
 
     df = df.loc[:, ['DIRECTORIO', 'SECUENCIA_ENCUESTA', 'SECUENCIA_P', 'ORDEN', 'sexo', 'edad', 
-                    'parentesco', 'estado_civil', 'padre_vive', 'nivel_educativo_padre', 'madre_vive', 
-                    'nivel_educativo_madre', 'cultura_pueblo', 'campesino', 'satisfaccion_vida', 
-                    'satisfaccion_economica', 'satisfaccion_salud', 'satisfaccion_seguridad', 
-                    'satisfaccion_trabajo', 'satisfaccion_tiempo_libre', 'felicidad', 'preocupacion', 'tristeza', 
-                    'deseo_vivir', 'escalon_vida', 'atraccion_sexual', 'se_reconoce_como']]
+                    'parentesco', 'generador_informacion', 'estado_civil', 'padre_vive', 
+                    'nivel_educativo_padre', 'madre_vive',  'nivel_educativo_madre', 'cultura_pueblo', 
+                    'campesino', 'satisfaccion_vida', 'satisfaccion_economica', 'satisfaccion_salud', 
+                    'satisfaccion_seguridad', 'satisfaccion_trabajo', 'satisfaccion_tiempo_libre', 
+                    'felicidad', 'preocupacion', 'tristeza', 'deseo_vivir', 'escalon_vida', 
+                    'atraccion_sexual', 'se_reconoce_como']]
     
-    df = df.dropna(subset=['felicidad'])
     df['campesino'] = np.where(df['campesino'] == 9, 2, df['campesino'])
     df['atraccion_sexual'] = np.where(df['atraccion_sexual'] == 9, 4, df['atraccion_sexual'])
     df['se_reconoce_como'] = np.where(df['se_reconoce_como'] == 9, 5, df['se_reconoce_como'])
@@ -87,6 +87,7 @@ def familias_madres_con_hijos(df: pd.DataFrame, estado_civil=[4, 5]) -> pd.DataF
     df['id_familias'] = df['DIRECTORIO'].astype(str) + '-' + df['SECUENCIA_P'].astype(str)
     df['id_secuencia_parentesco'] = df['SECUENCIA_ENCUESTA'].astype(str) + '-' + df['parentesco'].astype(str)
     df_aux = df.copy()
+    # df_errores = df_aux.loc[(df_aux['parentesco'] == 1) & (df_aux['felicidad'].notna())]
 
     # tomar las mujeres solteras cabeza de hogar
     df_mujeres_cabeza_solteras = df.loc[(df['SECUENCIA_P'] == 1) & (df['sexo'] == 2) & (df['parentesco'] == 1) & (df['estado_civil'].isin(estado_civil))]
@@ -110,7 +111,7 @@ def familias_madres_con_hijos(df: pd.DataFrame, estado_civil=[4, 5]) -> pd.DataF
     familias_con_hijos = familias_con_hijos.loc[:,[
         'id_familias', 'id_secuencia_parentesco',
         'DIRECTORIO', 'SECUENCIA_ENCUESTA', 'SECUENCIA_P', 'ORDEN', 'sexo',
-        'edad', 'parentesco', 'estado_civil', 'padre_vive',
+        'edad', 'parentesco', 'generador_informacion', 'estado_civil', 'padre_vive',
         'nivel_educativo_padre', 'madre_vive', 'nivel_educativo_madre',
         'cultura_pueblo', 'campesino', 'satisfaccion_vida',
         'satisfaccion_economica', 'satisfaccion_salud',
@@ -147,6 +148,9 @@ if __name__ == '__main__':
 
     # Create dataset
     familias_resultado = familias_madres_con_hijos(df_carateristicas)
+    
+    cargar_en_db(familias_resultado, 'familias')
+
     df = pd.merge(df_servicios, df_vivienda, how='left', on = ['DIRECTORIO', 'SECUENCIA_ENCUESTA', 'ORDEN'])
     df = pd.merge(familias_resultado, df, how='left', on = ['DIRECTORIO', 'SECUENCIA_ENCUESTA', 'ORDEN'])
 
