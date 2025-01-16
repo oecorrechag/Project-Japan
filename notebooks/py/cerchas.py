@@ -9,7 +9,7 @@ from mypackage import dir
 
 # Environment variables
 modality = 'p'
-project = 'japon'
+project = 'japan'
 data = dir.make_dir_line(modality, project) 
 processed = data('processed')
 models = data('models')

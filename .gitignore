@@ -62,6 +62,9 @@ old/
 notas.txt
 documentos/
 originales/
+rsconnect/ 
+cerchas.csv
+engranaje.gif
 
 env
 .gitignore
