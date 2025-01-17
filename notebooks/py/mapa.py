@@ -66,9 +66,8 @@ if __name__ == '__main__':
     df = df.loc[df['id_secuencia_parentesco'] == '1-1']
     cols_to_convert = ['P1_DEPARTAMENTO', 'P1_MUNICIPIO', 'REGION']
     df[cols_to_convert] = df[cols_to_convert].astype(float).astype(int)
-    df = df.loc[:,[
-        # 'DIRECTORIO', 'id_familias', 'id_secuencia_parentesco', 
-        'P1_DEPARTAMENTO', 'REGION', #'P1_MUNICIPIO', 
+    df = df.loc[:,[ 
+        'P1_DEPARTAMENTO', 'REGION', 
         'felicidad', 'tristeza',
         'satisfaccion_vida', 'satisfaccion_economica', 'satisfaccion_salud',
         'satisfaccion_seguridad', 'satisfaccion_trabajo', 'satisfaccion_tiempo_libre',
@@ -79,7 +78,6 @@ if __name__ == '__main__':
 
     df = pd.merge(df, poligonos3, how='left', on=['COD_DPTO'])
 
-    # Aplicar la función a cada fila del DataFrame
     df['nombre_region'] = df['departamento'].apply(obtener_region)
 
     df = df.loc[:,[
